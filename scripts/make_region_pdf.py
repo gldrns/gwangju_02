@@ -2,7 +2,8 @@
 
   - 광주송정역: 광주송정역_맛집카페_추천.md
   - 광주종합버스터미널(유스퀘어): 터미널_식당.md, 터미널_카페.md
-  - 광주-기아 챔피언스 필드: 챔필주변맛집.md, 광주_숙소.md
+  - 광주 챔피언스 필드: 챔필주변맛집.md
+  - 숙소(별도 카테고리): 광주_숙소.md
 
 지역마다 식당·카페를 3~5곳씩 넣고, 숙소는 지역 구분 없이 5곳을 따로 소개한다.
 사진은 research/images/, 출처는 research/images/sources.json에서 읽는다.
@@ -149,8 +150,8 @@ REGIONS = [
         ],
     },
     {
-        "name": "광주-기아 챔피언스 필드",
-        "subtitle": "야구장에서 걸어서 20분 안의 맛집·카페 + 야구 관람 후 숙소",
+        "name": "광주 챔피언스 필드",
+        "subtitle": "야구장에서 걸어서 20분 안의 맛집·카페",
         "info": [
             ["기준점", "광주-기아 챔피언스 필드 (광주 북구 서림로 10)"],
             ["조사일", "2026-11-12"],
@@ -271,18 +272,23 @@ LODGING_TIPS = [
 
 # ---------------------------------------------------------------- 화면 구성
 def overview_table():
-    data = [[p(h, head_style) for h in ["지역", "식당", "카페"]]]
-    for r in REGIONS:
-        def names(items):
-            return "<br/>".join(n for _, n, _ in items) if items else "<font color='grey'>조사 자료 없음</font>"
-        data.append([p(f"<font name='NanumBold'>{r['name']}</font>"), p(names(r["restaurants"])),
+    """목차 겸 한눈에 보기: 1~3 지역(식당·카페) + 4 숙소."""
+    def names(items):
+        return "<br/>".join(n for _, n, _ in items)
+    data = [[p(h, head_style) for h in ["구분", "식당", "카페"]]]
+    for i, r in enumerate(REGIONS, 1):
+        data.append([p(f"<font name='NanumBold'>{i}. {r['name']}</font>"), p(names(r["restaurants"])),
                      p(names(r["cafes"]))])
+    n = len(REGIONS) + 1
+    data.append([p(f"<font name='NanumBold'>{n}. 숙소</font>"), p(names(LODGINGS)), ""])
+    last = len(data) - 1
     t = Table(data, colWidths=[50 * mm, 62 * mm, 68 * mm])
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), ACCENT),
         ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, LIGHT]),
         ("GRID", (0, 0), (-1, -1), 0.5, GRID),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("SPAN", (1, last), (2, last)),  # 숙소는 식당·카페 칸을 합쳐서 쓴다
     ]))
     return t
 
@@ -307,8 +313,8 @@ def region_story(idx, r):
 
 def lodging_story(idx):
     # 숙소 5곳이 한 쪽에 들어가도록 안내 문구를 카드 위에 둔다.
-    s = [Paragraph(f"{idx}. 숙소 추천 5곳", part_style),
-         Paragraph("경기 보고 하룻밤 묵기 좋은 광주 숙소", subtitle_style),
+    s = [Paragraph(f"{idx}. 숙소", part_style),
+         Paragraph("경기 보고 하룻밤 묵기 좋은 광주 숙소 5곳", subtitle_style),
          Spacer(1, 4), info_table(LODGING_INFO), Spacer(1, 4)]
     s += bullets(LODGING_TIPS)
     s.append(Spacer(1, 6))
@@ -358,12 +364,12 @@ def build(out_path):
                                      "link": "", "_temp": True})
     label = TITLE
     s = [Paragraph(TITLE, title_style),
-         Paragraph("광주송정역 · 유스퀘어 터미널 · 챔피언스 필드 맛집·카페 + 숙소 추천 5곳", subtitle_style),
+         Paragraph("1. 광주송정역 · 2. 유스퀘어 터미널 · 3. 광주 챔피언스 필드 · 4. 숙소", subtitle_style),
          Spacer(1, 10), Paragraph("한눈에 보기", h1_style), overview_table(), Spacer(1, 6)]
     s += bullets([
         "차 없이 챔피언스 필드로 원정 가는 사람을 위해, 광주에 도착하는 곳(송정역·버스터미널)과 "
         "야구장 주변의 식당·카페를 지역마다 3~5곳씩 골랐다.",
-        "숙소는 지역을 나누지 않고 5곳을 따로 추천했다(4장).",
+        "숙소는 지역과 상관없는 다른 카테고리로 보고, 4장에 5곳을 따로 추천했다.",
         "지역마다 조사한 사이트가 달라서 점수 기준이 다르다(송정역·챔필 맛집: 네이버 플레이스, "
         "터미널: 다이닝코드, 숙소: 구글 호텔). 지역끼리 점수를 바로 비교하지 않는 것이 좋다.",
         "모든 정보는 2026-11-12 조사 기준이다. 영업시간·가격은 바뀔 수 있으니 가기 전에 지도 앱에서 다시 확인한다.",
