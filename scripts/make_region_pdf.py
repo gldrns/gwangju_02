@@ -1,10 +1,10 @@
-"""research 폴더의 md 자료 5개를 지역별로 종합해 광주_지역별_가이드.pdf를 만든다.
+"""research 폴더의 md 자료 5개를 종합해 '챔피언스필드 원정가는 뚜벅이 가이드' PDF를 만든다.
 
   - 광주송정역: 광주송정역_맛집카페_추천.md
   - 광주종합버스터미널(유스퀘어): 터미널_식당.md, 터미널_카페.md
   - 광주-기아 챔피언스 필드: 챔필주변맛집.md, 광주_숙소.md
 
-지역마다 식당·카페·숙소를 3~5곳씩 넣는다(자료가 없는 숙소는 '조사 자료 없음'으로 표시).
+지역마다 식당·카페를 3~5곳씩 넣고, 숙소는 지역 구분 없이 5곳을 따로 소개한다.
 사진은 research/images/, 출처는 research/images/sources.json에서 읽는다.
 
 사용법: python scripts/make_region_pdf.py [출력경로]
@@ -29,7 +29,6 @@ from make_terminal_pdf import (  # noqa: E402
 part_style = ParagraphStyle("region", parent=title_style, fontSize=16, leading=22, spaceAfter=2)
 # 첫 카드와 KeepTogether로 직접 묶으므로 keepWithNext는 끈다(켜 두면 쪽이 불필요하게 넘어간다).
 sec_style = ParagraphStyle("sec", parent=h1_style, keepWithNext=0)
-empty_style = ParagraphStyle("empty", parent=p("").style, textColor=colors.grey, fontSize=9)
 
 
 def b(label, value):
@@ -90,7 +89,6 @@ REGIONS = [
                 b("포인트:", "역에서 걸어서 2분. 아메리카노 1천 원대. 23시까지 영업"),
             ]),
         ],
-        "lodgings": [],
         "tips": [
             "기차 시간 전후로는 역 앞의 영명국밥해장국(새벽 2시 30분까지)과 청자다방(23시까지)이 가장 가깝다.",
             "갱소년 양갱 세트는 포장이 예뻐서 돌아가는 길에 선물로 사기 좋다.",
@@ -144,7 +142,6 @@ REGIONS = [
                 b("포인트:", "'예쁜', '테라스' 태그가 붙은 분위기 좋은 카페"),
             ]),
         ],
-        "lodgings": [],
         "tips": [
             "터미널을 나가기 싫다면 건물 안의 모모정(일본가정식)이나 2층의 카페 미뇽(에그타르트 포장)도 있다.",
             "밤늦게는 왕뼈사랑 유스퀘어, 24시간 영업 후기가 있는 카페 갤러리24(직선 약 790m)를 고려할 만하다.",
@@ -224,52 +221,63 @@ REGIONS = [
                 b("포인트:", "교회 의자가 있는 로스터리 카페. 밤 12시까지라 경기 뒤에도 갈 수 있음"),
             ]),
         ],
-        "lodgings": [
-            ("h1", "에이치원호텔", [
-                b("구글 평점:", "4.4 (리뷰 84)"),
-                b("거리:", "야구장에서 약 620m"),
-                b("포인트:", "수영장, 무료 주차. '챔필 도보 10~15분', '원정 직관 숙소' 후기 여러 개"),
-            ]),
-            ("h2", "브라운도트호텔 신안점", [
-                b("구글 평점:", "4.5 (리뷰 20)"),
-                b("거리:", "약 1.4km"),
-                b("포인트:", "3성급. 평점은 가장 높지만 리뷰가 적고 야구장과 거리가 있음"),
-            ]),
-            ("h3", "소풍호텔", [
-                b("구글 평점:", "4.3 (리뷰 32)"),
-                b("거리:", "약 730m"),
-                b("포인트:", "편의시설 정보는 구글 결과에 없었음"),
-            ]),
-            ("h4", "광주 에디션호텔", [
-                b("구글 평점:", "4.2 (리뷰 163)"),
-                b("거리:", "약 940m"),
-                b("포인트:", "3성급. 조식 포함. 리뷰 수가 가장 많음"),
-            ]),
-            ("h5", "비지니스호텔 어반라이프", [
-                b("구글 평점:", "4.2 (리뷰 21)"),
-                b("거리:", "약 950m"),
-                b("포인트:", "에디션호텔과 평점·거리가 거의 같음"),
-            ]),
-        ],
         "tips": [
             "일요일에는 이대포땔나무집·필로스팅하우스가 쉬고, 금바다수산은 15시에 연다.",
             "경기가 끝난 뒤에는 하준족발보쌈(24시), 무화과로스터스(24시), 아스테리(23시)가 늦게까지 연다.",
             "챔필 물품보관함은 경기 시작 2시간 전부터 쓸 수 있다는 원정 후기가 있다.",
-            "경기 날에는 근처 숙소가 빨리 찬다는 후기가 있다. 숙소 거리는 구글 호텔 검색 표시 거리다.",
         ],
     },
 ]
 
 
+# 숙소: 지역 구분 없이 5곳 (광주_숙소.md)
+LODGINGS = [
+    ("h1", "에이치원호텔", [
+        b("구글 평점:", "4.4 (리뷰 84)"),
+        b("거리:", "야구장에서 약 620m"),
+        b("포인트:", "수영장, 무료 주차. '챔필 도보 10~15분', '원정 직관 숙소' 후기 여러 개"),
+    ]),
+    ("h2", "브라운도트호텔 신안점", [
+        b("구글 평점:", "4.5 (리뷰 20)"),
+        b("거리:", "야구장에서 약 1.4km"),
+        b("포인트:", "3성급. 평점은 가장 높지만 리뷰가 적고 야구장과 거리가 있음"),
+    ]),
+    ("h3", "소풍호텔", [
+        b("구글 평점:", "4.3 (리뷰 32)"),
+        b("거리:", "야구장에서 약 730m"),
+        b("포인트:", "편의시설 정보는 구글 결과에 없었음"),
+    ]),
+    ("h4", "광주 에디션호텔", [
+        b("구글 평점:", "4.2 (리뷰 163)"),
+        b("거리:", "야구장에서 약 940m"),
+        b("포인트:", "3성급. 조식 포함. 리뷰 수가 가장 많음"),
+    ]),
+    ("h5", "비지니스호텔 어반라이프", [
+        b("구글 평점:", "4.2 (리뷰 21)"),
+        b("거리:", "야구장에서 약 950m"),
+        b("포인트:", "에디션호텔과 평점·거리가 거의 같음"),
+    ]),
+]
+LODGING_INFO = [
+    ["조사일", "2026-11-12 (조사 도구: ego-browser)"],
+    ["출처", "구글 호텔 검색 결과(\"광주 기아챔피언스필드 근처 호텔\" → 주변 124개), 네이버 블로그 후기(참고용)"],
+]
+LODGING_TIPS = [
+    "구글 평점이 높은 순으로 골랐다(리뷰 20개 미만·광고·공유숙박 제외, 평점이 비슷하면 야구장에서 가까운 순).",
+    "가격은 날짜마다 달라서 적지 않았다. 경기 날에는 근처 숙소가 빨리 찬다는 후기가 있으니 일찍 예약한다.",
+    "거리는 구글 호텔 검색 표시 거리다. 체크인 시간·주차 조건은 미확인이니 예약 전에 확인한다.",
+]
+
+
 # ---------------------------------------------------------------- 화면 구성
 def overview_table():
-    data = [[p(h, head_style) for h in ["지역", "식당", "카페", "숙소"]]]
+    data = [[p(h, head_style) for h in ["지역", "식당", "카페"]]]
     for r in REGIONS:
         def names(items):
             return "<br/>".join(n for _, n, _ in items) if items else "<font color='grey'>조사 자료 없음</font>"
         data.append([p(f"<font name='NanumBold'>{r['name']}</font>"), p(names(r["restaurants"])),
-                     p(names(r["cafes"])), p(names(r["lodgings"]))])
-    t = Table(data, colWidths=[36 * mm, 48 * mm, 52 * mm, 44 * mm])
+                     p(names(r["cafes"]))])
+    t = Table(data, colWidths=[50 * mm, 62 * mm, 68 * mm])
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), ACCENT),
         ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, LIGHT]),
@@ -281,9 +289,6 @@ def overview_table():
 
 def section(title, items):
     out = [Paragraph(f"{title} ({len(items)}곳)" if items else title, sec_style)]
-    if not items:
-        out.append(Paragraph("이 지역은 숙소 조사 자료가 없어서 넣지 않았다.", empty_style))
-        return out
     cards = [card(key, i, name, lines) for i, (key, name, lines) in enumerate(items, 1)]
     # 제목이 쪽 끝에 혼자 남지 않도록 첫 카드와 묶는다.
     out = [KeepTogether([out[0]] + list(cards[0]._content))] + cards[1:]
@@ -295,9 +300,19 @@ def region_story(idx, r):
          Spacer(1, 8), info_table(r["info"])]
     s += section("식당", r["restaurants"])
     s += section("카페", r["cafes"])
-    s += section("숙소", r["lodgings"])
     s.append(Paragraph("알아 두면 좋은 점", h2_style))
     s += bullets(r["tips"])
+    return s
+
+
+def lodging_story(idx):
+    # 숙소 5곳이 한 쪽에 들어가도록 안내 문구를 카드 위에 둔다.
+    s = [Paragraph(f"{idx}. 숙소 추천 5곳", part_style),
+         Paragraph("경기 보고 하룻밤 묵기 좋은 광주 숙소", subtitle_style),
+         Spacer(1, 4), info_table(LODGING_INFO), Spacer(1, 4)]
+    s += bullets(LODGING_TIPS)
+    s.append(Spacer(1, 6))
+    s += [card(key, i, name, lines) for i, (key, name, lines) in enumerate(LODGINGS, 1)]
     return s
 
 
@@ -307,9 +322,10 @@ def sources_story():
            p("송정역 사진은 원본 자료(광주송정역_맛집카페_추천.md)에 적힌 대로 네이버 플레이스 업체 사진이다. "
              "나머지는 네이버 블로그 후기 사진이고(소풍호텔은 사용자가 직접 제공), 저작권은 각 작성자에게 있다."),
            Spacer(1, 6)]
-    data = [[p(h, head_style) for h in ["지역", "가게 · 숙소", "출처", "블로그 글 제목 / 주소"]]]
-    for r in REGIONS:
-        for key, name, _ in r["restaurants"] + r["cafes"] + r["lodgings"]:
+    data = [[p(h, head_style) for h in ["구분", "가게 · 숙소", "출처", "블로그 글 제목 / 주소"]]]
+    groups = [(r["name"].split("(")[0], r["restaurants"] + r["cafes"]) for r in REGIONS] + [("숙소", LODGINGS)]
+    for group, items in groups:
+        for key, name, _ in items:
             src = SOURCES.get(key)
             if src is None or src.get("_temp"):
                 who, where = SONGJEONG_PHOTO, "원본 md의 images/ 폴더 사진"
@@ -319,7 +335,7 @@ def sources_story():
                         f"<link href='{src['link']}' color='blue'>{src['link']}</link>"
             else:
                 who, where = src["site"], "사용자가 직접 제공한 사진"
-            data.append([p(r["name"].split("(")[0]), p(name), p(who), Paragraph(where, link_style)])
+            data.append([p(group), p(name), p(who), Paragraph(where, link_style)])
     t = Table(data, colWidths=[26 * mm, 38 * mm, 34 * mm, 82 * mm], repeatRows=1)
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), ACCENT),
@@ -331,18 +347,23 @@ def sources_story():
     return out
 
 
+TITLE = "챔피언스필드 원정가는 뚜벅이 가이드"
+
+
 def build(out_path):
     # 송정역 사진은 sources.json에 없으므로 사진 아래 출처 문구를 따로 넣는다.
     for r in REGIONS[:1]:
         for key, _, _ in r["restaurants"] + r["cafes"]:
             SOURCES.setdefault(key, {"site": SONGJEONG_PHOTO, "writer": "", "date": "", "title": "",
                                      "link": "", "_temp": True})
-    label = "광주 지역별 맛집·카페·숙소 가이드"
-    s = [Paragraph("광주 지역별 맛집·카페·숙소 가이드", title_style),
-         Paragraph("광주송정역 · 광주종합버스터미널(유스퀘어) · 광주-기아 챔피언스 필드", subtitle_style),
+    label = TITLE
+    s = [Paragraph(TITLE, title_style),
+         Paragraph("광주송정역 · 유스퀘어 터미널 · 챔피언스 필드 맛집·카페 + 숙소 추천 5곳", subtitle_style),
          Spacer(1, 10), Paragraph("한눈에 보기", h1_style), overview_table(), Spacer(1, 6)]
     s += bullets([
-        "지역마다 식당·카페·숙소를 3~5곳씩 골랐다. 송정역과 터미널은 숙소 조사 자료가 없어서 숙소를 넣지 않았다.",
+        "차 없이 챔피언스 필드로 원정 가는 사람을 위해, 광주에 도착하는 곳(송정역·버스터미널)과 "
+        "야구장 주변의 식당·카페를 지역마다 3~5곳씩 골랐다.",
+        "숙소는 지역을 나누지 않고 5곳을 따로 추천했다(4장).",
         "지역마다 조사한 사이트가 달라서 점수 기준이 다르다(송정역·챔필 맛집: 네이버 플레이스, "
         "터미널: 다이닝코드, 숙소: 구글 호텔). 지역끼리 점수를 바로 비교하지 않는 것이 좋다.",
         "모든 정보는 2026-11-12 조사 기준이다. 영업시간·가격은 바뀔 수 있으니 가기 전에 지도 앱에서 다시 확인한다.",
@@ -351,10 +372,12 @@ def build(out_path):
         s.append(PageBreak())
         s += region_story(i, r)
     s.append(PageBreak())
+    s += lodging_story(len(REGIONS) + 1)
+    s.append(PageBreak())
     s += sources_story()
     footer = make_footer(label)
     new_doc(out_path, label).build(s, onFirstPage=footer, onLaterPages=footer)
 
 
 if __name__ == "__main__":
-    build(sys.argv[1] if len(sys.argv) > 1 else "research/광주_지역별_가이드.pdf")
+    build(sys.argv[1] if len(sys.argv) > 1 else "research/챔피언스필드_원정가는_뚜벅이_가이드.pdf")
