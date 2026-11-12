@@ -122,20 +122,38 @@ def bullets(items):
     return [Paragraph(i, bullet_style, bulletText="•") for i in items]
 
 
-def footer(canvas, doc):
-    canvas.saveState()
-    canvas.setFont("Nanum", 8)
-    canvas.setFillColor(colors.grey)
-    canvas.drawCentredString(A4[0] / 2, 10 * mm, f"광주종합버스터미널 주변 식당·카페 가이드 — {doc.page}")
-    canvas.restoreState()
+def make_footer(label):
+    """쪽 아래에 문서 이름과 쪽 번호를 넣는 함수를 만든다."""
+    def footer(canvas, doc):
+        canvas.saveState()
+        canvas.setFont("Nanum", 8)
+        canvas.setFillColor(colors.grey)
+        canvas.drawCentredString(A4[0] / 2, 10 * mm, f"{label} — {doc.page}")
+        canvas.restoreState()
+    return footer
 
 
-def build(out_path):
-    doc = SimpleDocTemplate(out_path, pagesize=A4, leftMargin=15 * mm, rightMargin=15 * mm,
-                            topMargin=15 * mm, bottomMargin=18 * mm,
-                            title="광주종합버스터미널 주변 식당·카페 가이드")
+def info_table(info):
+    """기준점·조사일·출처 같은 정보 표."""
+    it = Table([[p(f"<font name='NanumBold'>{k}</font>"), p(v)] for k, v in info],
+               colWidths=[22 * mm, 158 * mm])
+    it.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (0, -1), LIGHT),
+        ("GRID", (0, 0), (-1, -1), 0.5, GRID),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+    return it
+
+
+def new_doc(out_path, title):
+    return SimpleDocTemplate(out_path, pagesize=A4, leftMargin=15 * mm, rightMargin=15 * mm,
+                             topMargin=15 * mm, bottomMargin=18 * mm, title=title)
+
+
+def terminal_story(header_style=title_style):
+    """터미널 식당·카페 부분의 내용 목록을 만든다."""
     s = []
-    s.append(Paragraph("광주종합버스터미널(유스퀘어) 주변 식당·카페 가이드", title_style))
+    s.append(Paragraph("광주종합버스터미널(유스퀘어) 주변 식당·카페 가이드", header_style))
     s.append(Paragraph("터미널에서 직선거리 1km 안 · 식당 3곳 + 카페 3곳", subtitle_style))
     s.append(Spacer(1, 8))
 
@@ -145,14 +163,7 @@ def build(out_path):
         ["출처", "다이닝코드 검색 결과(유스퀘어·광천동·농성동·화정동 상위 결과, 가게 페이지의 주소와 지도 좌표), "
                "네이버 검색 결과(\"광주버스터미널 맛집\", \"광주버스터미널 카페\")"],
     ]
-    it = Table([[p(f"<font name='NanumBold'>{k}</font>"), p(v)] for k, v in info],
-               colWidths=[22 * mm, 158 * mm])
-    it.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (0, -1), LIGHT),
-        ("GRID", (0, 0), (-1, -1), 0.5, GRID),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-    ]))
-    s.append(it)
+    s.append(info_table(info))
 
     s.append(Paragraph("1. 한눈에 보기 (가까운 순)", h1_style))
     s.append(summary_table())
@@ -187,7 +198,13 @@ def build(out_path):
         "가기 전에 지도 앱에서 다시 확인하는 것이 좋다.",
     ]))
 
-    doc.build(s, onFirstPage=footer, onLaterPages=footer)
+    return s
+
+
+def build(out_path):
+    label = "광주종합버스터미널 주변 식당·카페 가이드"
+    footer = make_footer(label)
+    new_doc(out_path, label).build(terminal_story(), onFirstPage=footer, onLaterPages=footer)
 
 
 if __name__ == "__main__":
