@@ -8,8 +8,10 @@
 
 사용법: python scripts/make_summary_pdf.py [출력경로]
 """
+import json
 import os
 import sys
+from xml.sax.saxutils import escape
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
@@ -28,6 +30,10 @@ from make_terminal_pdf import (  # noqa: E402
 IMAGE_DIR = os.environ.get("GUIDE_IMAGE_DIR", "research/images")
 PHOTO_W, PHOTO_H = 45 * mm, 32 * mm
 
+SOURCES_PATH = os.path.join(IMAGE_DIR, "sources.json")
+SOURCES = json.load(open(SOURCES_PATH, encoding="utf-8")) if os.path.exists(SOURCES_PATH) else {}
+NAMES = {}  # 사진 키 → 가게·숙소 이름 (출처 표에 사용)
+
 part_style = ParagraphStyle("part2", parent=title_style, fontSize=15, leading=20, spaceAfter=2)
 name_style = ParagraphStyle("name", fontName="NanumBold", fontSize=11, leading=15, textColor=ACCENT)
 ph_style = ParagraphStyle("ph", fontName="Nanum", fontSize=8, leading=11, alignment=TA_CENTER,
@@ -42,13 +48,22 @@ def find_photo(key):
     return None
 
 
+credit_style = ParagraphStyle("credit", fontName="Nanum", fontSize=6.5, leading=8.5,
+                              alignment=TA_CENTER, textColor=colors.grey)
+
+
 def photo_cell(key):
-    """사진이 있으면 비율을 지켜 넣고, 없으면 빈 칸을 넣는다."""
+    """사진이 있으면 비율을 지켜 넣고 출처를 아래에 단다. 없으면 빈 칸을 넣는다."""
     path = find_photo(key)
     if path:
         iw, ih = ImageReader(path).getSize()
         scale = min(PHOTO_W / iw, PHOTO_H / ih)
-        return Image(path, width=iw * scale, height=ih * scale)
+        cell = [Image(path, width=iw * scale, height=ih * scale)]
+        src = SOURCES.get(key)
+        if src:
+            cell.append(Paragraph(
+                f"사진: {src['site']} '{escape(src['writer'])}' ({src['date']})", credit_style))
+        return cell
     box = Table([[Paragraph("사진 준비 중", ph_style)]], colWidths=[PHOTO_W], rowHeights=[PHOTO_H])
     box.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F2F2F2")),
@@ -60,6 +75,7 @@ def photo_cell(key):
 
 def card(key, rank, name, lines):
     """사진 + 설명으로 된 가게 카드 한 개."""
+    NAMES[key] = name
     info = [Paragraph(f"{rank}. {name}", name_style), Spacer(1, 3)]
     info += [p(line) for line in lines]
     t = Table([[photo_cell(key), info]], colWidths=[PHOTO_W + 4 * mm, 180 * mm - PHOTO_W - 4 * mm])
@@ -101,6 +117,33 @@ def lodging_cards():
     return out
 
 
+def sources_story():
+    """부록: 사진 출처 목록."""
+    link_style = ParagraphStyle("link", parent=p("").style, fontSize=7.5, leading=10)
+    out = [PageBreak(), Paragraph("부록. 사진 출처", h1_style),
+           p("PDF에 넣은 사진은 네이버 이미지 검색에서 찾은 네이버 블로그 후기 사진이다. "
+             "저작권은 각 블로그 작성자에게 있다. 사진이 없는 곳은 해당 가게·숙소의 사진임을 "
+             "확인할 수 있는 결과를 찾지 못한 곳이다."), Spacer(1, 6)]
+    from make_terminal_pdf import head_style
+    data = [[p(h, head_style) for h in ["가게 · 숙소", "작성자 (날짜)", "블로그 글 제목 / 주소"]]]
+    for key, src in SOURCES.items():
+        data.append([
+            p(NAMES.get(key, key)),
+            p(f"{escape(src['writer'])}<br/>({src['date']})"),
+            Paragraph(f"{escape(src['title'])}<br/><link href='{src['link']}' color='blue'>{src['link']}</link>",
+                      link_style),
+        ])
+    t = Table(data, colWidths=[40 * mm, 35 * mm, 105 * mm], repeatRows=1)
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), ACCENT),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, LIGHT]),
+        ("GRID", (0, 0), (-1, -1), 0.5, GRID),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+    out.append(t)
+    return out
+
+
 def build(out_path):
     label = "광주 종합 가이드 (터미널 식당·카페 · 야구장 근처 숙소)"
     s = [Paragraph("광주 종합 가이드", title_style),
@@ -125,6 +168,7 @@ def build(out_path):
     s.append(Paragraph("사진으로 보기 — 숙소", h1_style))
     s.extend(lodging_cards())
     s.extend(lod[4:])
+    s.extend(sources_story())
 
     footer = make_footer(label)
     new_doc(out_path, label).build(s, onFirstPage=footer, onLaterPages=footer)
