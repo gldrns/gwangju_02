@@ -52,6 +52,13 @@ credit_style = ParagraphStyle("credit", fontName="Nanum", fontSize=6.5, leading=
                               alignment=TA_CENTER, textColor=colors.grey)
 
 
+def credit_text(src):
+    """사진 아래에 붙일 출처 문구. 작성자가 없으면(사용자 제공 등) 출처 이름만 쓴다."""
+    if src.get("writer"):
+        return f"사진: {src['site']} '{escape(src['writer'])}' ({src['date']})"
+    return f"사진: {src['site']}"
+
+
 def photo_cell(key):
     """사진이 있으면 비율을 지켜 넣고 출처를 아래에 단다. 없으면 빈 칸을 넣는다."""
     path = find_photo(key)
@@ -62,7 +69,7 @@ def photo_cell(key):
         src = SOURCES.get(key)
         if src:
             cell.append(Paragraph(
-                f"사진: {src['site']} '{escape(src['writer'])}' ({src['date']})", credit_style))
+                credit_text(src), credit_style))
         return cell
     box = Table([[Paragraph("사진 준비 중", ph_style)]], colWidths=[PHOTO_W], rowHeights=[PHOTO_H])
     box.setStyle(TableStyle([
@@ -121,17 +128,17 @@ def sources_story():
     """부록: 사진 출처 목록."""
     link_style = ParagraphStyle("link", parent=p("").style, fontSize=7.5, leading=10)
     out = [PageBreak(), Paragraph("부록. 사진 출처", h1_style),
-           p("PDF에 넣은 사진은 네이버 이미지 검색에서 찾은 네이버 블로그 후기 사진이다. "
-             "저작권은 각 블로그 작성자에게 있다. 사진이 없는 곳은 해당 가게·숙소의 사진임을 "
-             "확인할 수 있는 결과를 찾지 못한 곳이다."), Spacer(1, 6)]
+           p("PDF에 넣은 사진은 네이버 이미지 검색에서 찾은 네이버 블로그 후기 사진이다"
+             "(소풍호텔은 사용자가 직접 제공한 사진). "
+             "저작권은 각 블로그 작성자에게 있다."), Spacer(1, 6)]
     from make_terminal_pdf import head_style
     data = [[p(h, head_style) for h in ["가게 · 숙소", "작성자 (날짜)", "블로그 글 제목 / 주소"]]]
     for key, src in SOURCES.items():
         data.append([
             p(NAMES.get(key, key)),
-            p(f"{escape(src['writer'])}<br/>({src['date']})"),
-            Paragraph(f"{escape(src['title'])}<br/><link href='{src['link']}' color='blue'>{src['link']}</link>",
-                      link_style),
+            p(f"{escape(src['writer'])}<br/>({src['date']})" if src.get("writer") else src["site"]),
+            Paragraph(f"{escape(src['title'])}<br/><link href='{src['link']}' color='blue'>{src['link']}</link>"
+                      if src.get("link") else "사용자가 직접 제공한 사진", link_style),
         ])
     t = Table(data, colWidths=[40 * mm, 35 * mm, 105 * mm], repeatRows=1)
     t.setStyle(TableStyle([
