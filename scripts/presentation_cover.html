@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1920px; height: 1080px; overflow: hidden; font-family: 'NanumSquare', sans-serif; }
+  .stage { position: relative; width: 1920px; height: 1080px; overflow: hidden;
+    background: radial-gradient(ellipse 900px 500px at 1450px 120px, rgba(255,240,200,.18), transparent 70%),
+                radial-gradient(ellipse 700px 420px at 300px 60px, rgba(255,240,200,.10), transparent 70%),
+                linear-gradient(180deg, #0b1830 0%, #12284a 55%, #173a5e 100%); }
+  /* 조명탑 */
+  .light { position: absolute; top: 70px; width: 120px; height: 34px; border-radius: 6px;
+    background: repeating-linear-gradient(90deg, #fff8dc 0 18px, #c9b98a 18px 22px);
+    box-shadow: 0 0 60px 20px rgba(255,236,170,.35); }
+  /* 외야 잔디 */
+  .field { position: absolute; left: -200px; right: -200px; bottom: -1130px; height: 1500px; border-radius: 50%;
+    background: repeating-linear-gradient(90deg, #2f7d43 0 120px, #2a7140 120px 240px);
+    box-shadow: 0 -10px 0 #c99a5b, 0 -18px 0 #e7c48d; }
+  .content { position: absolute; left: 140px; top: 170px; width: 1060px; color: #fff; }
+  .badge { display: inline-block; padding: 14px 30px; border-radius: 40px; background: #e8463a;
+    font-family: 'NanumSquareRound'; font-weight: 700; font-size: 34px; letter-spacing: 1px; }
+  h1 { margin-top: 38px; font-family: 'NanumSquare'; font-weight: 800; font-size: 112px; line-height: 1.15;
+    letter-spacing: -2px; text-shadow: 0 6px 24px rgba(0,0,0,.35); }
+  h1 .accent { color: #ffd166; }
+  .sub { margin-top: 30px; font-size: 40px; color: #dbe6f5; font-family: 'NanumBarunGothic'; }
+  .route { position: absolute; left: 140px; bottom: 150px; display: flex; align-items: center; gap: 22px; }
+  .stop { padding: 18px 34px; border-radius: 16px; background: #fff; color: #12284a; font-weight: 800;
+    font-size: 36px; box-shadow: 0 8px 20px rgba(0,0,0,.25); }
+  .stop.main { background: #ffd166; }
+  .arrow { color: #fff; font-size: 44px; font-weight: 800; }
+  .foot { position: absolute; right: 120px; bottom: 60px; color: rgba(255,255,255,.85);
+    font-family: 'NanumBarunGothic'; font-size: 28px; }
+  .art { position: absolute; right: 120px; top: 130px; width: 640px; height: 640px; }
+</style></head>
+<body><div class="stage">
+  <div class="light" style="left:260px"></div>
+  <div class="light" style="left:1380px"></div>
+  <div class="light" style="left:1700px"></div>
+  <div class="field"></div>
+
+  <svg class="art" viewBox="0 0 640 640">
+    <!-- 큰 야구공 -->
+    <g transform="translate(330 300)">
+      <circle r="230" fill="#fdfbf5" stroke="#d9d2c0" stroke-width="6"/>
+      <path d="M-150,-175 C-60,-90 -60,90 -150,175" fill="none" stroke="#e8463a" stroke-width="7"/>
+      <path d="M150,-175 C60,-90 60,90 150,175" fill="none" stroke="#e8463a" stroke-width="7"/>
+      <g stroke="#e8463a" stroke-width="6" stroke-linecap="round">
+        <line x1="-132" y1="-140" x2="-104" y2="-152"/><line x1="-112" y1="-104" x2="-84" y2="-112"/>
+        <line x1="-98" y1="-66" x2="-70" y2="-70"/><line x1="-92" y1="-26" x2="-64" y2="-26"/>
+        <line x1="-92" y1="16" x2="-64" y2="18"/><line x1="-98" y1="58" x2="-70" y2="64"/>
+        <line x1="-112" y1="98" x2="-84" y2="108"/><line x1="-132" y1="134" x2="-104" y2="148"/>
+        <line x1="132" y1="-140" x2="104" y2="-152"/><line x1="112" y1="-104" x2="84" y2="-112"/>
+        <line x1="98" y1="-66" x2="70" y2="-70"/><line x1="92" y1="-26" x2="64" y2="-26"/>
+        <line x1="92" y1="16" x2="64" y2="18"/><line x1="98" y1="58" x2="70" y2="64"/>
+        <line x1="112" y1="98" x2="84" y2="108"/><line x1="132" y1="134" x2="104" y2="148"/>
+      </g>
+    </g>
+    <!-- 국그릇 -->
+    <g transform="translate(95 520)">
+      <circle r="92" fill="#ffd166"/>
+      <path d="M-56,-6 h112 a56,52 0 0 1 -112,0 z" fill="#fff"/>
+      <rect x="-64" y="-14" width="128" height="10" rx="5" fill="#fff"/>
+      <g stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none">
+        <path d="M-22,-30 q-8,-12 0,-24 q8,-12 0,-24"/><path d="M0,-30 q-8,-12 0,-24 q8,-12 0,-24"/>
+        <path d="M22,-30 q-8,-12 0,-24 q8,-12 0,-24"/>
+      </g>
+    </g>
+    <!-- 커피잔 -->
+    <g transform="translate(560 540)">
+      <circle r="80" fill="#e8463a"/>
+      <rect x="-38" y="-30" width="62" height="64" rx="10" fill="#fff"/>
+      <path d="M24,-16 h10 a16,16 0 0 1 0,32 h-10" fill="none" stroke="#fff" stroke-width="8"/>
+      <rect x="-48" y="38" width="92" height="8" rx="4" fill="#fff"/>
+    </g>
+  </svg>
+
+  <div class="content">
+    <div class="badge">광주 야구 원정 가이드</div>
+    <h1>챔피언스필드<br><span class="accent">원정 맛집 · 카페</span></h1>
+    <p class="sub">차 없이 오는 원정 팬을 위한 광주 맛집 · 카페 추천 코스</p>
+  </div>
+
+  <div class="route">
+    <div class="stop">광주송정역</div><div class="arrow">→</div>
+    <div class="stop">유스퀘어 터미널</div><div class="arrow">→</div>
+    <div class="stop main">챔피언스필드</div>
+  </div>
+  <div class="foot">2026.11 조사 · 네이버 플레이스 · 다이닝코드 · 야구팬 원정 후기</div>
+</div></body></html>
